@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mercado Municipal — Gestión de Puestos</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; }
+
+    :root {
+      --verde-900: #1E3A14;
+      --verde-800: #2C5020;
+      --verde-700: #3B6228;
+      --verde-600: #4A7A33;
+      --verde-400: #7DB05A;
+      --verde-300: #A0C980;
+      --verde-200: #C5E0A8;
+      --verde-100: #E2F0D0;
+      --verde-50:  #F0F7E8;
+      --arena:     #F8F6F1;
+      --blanco:    #FFFFFF;
+      --gris-100:  #F2F0EB;
+      --gris-200:  #E0DDD6;
+      --gris-400:  #A8A49E;
+      --gris-600:  #706C65;
+      --gris-900:  #1C1A18;
+      --rojo-bg:   #FDEEEE;
+      --rojo-text: #8A2020;
+      --rojo-borde:#F0B0B0;
+      --radio:     10px;
+      --radio-lg:  16px;
+      --radio-xl:  22px;
+      --sombra-sm: 0 1px 4px rgba(0,0,0,.06);
+
+      /* colores de puesto */
+      --puesto-disponible: #3B8C2A;
+      --puesto-ocupado:    #C0392B;
+      --puesto-moroso:     #C8A000;
+    }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--arena);
+      color: var(--gris-900);
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    /* ── NAVBAR ───────────────────────────────────────── */
+    .navbar { background: var(--verde-900); position: sticky; top: 0; z-index: 100; }
+
+    .nav-top {
+      display: flex; align-items: center;
+      padding: 0 36px; height: 52px;
+      border-bottom: 1px solid rgba(255,255,255,.07); gap: 12px;
+    }
+    .nav-logo { display: flex; align-items: center; gap: 10px; text-decoration: none; flex-shrink: 0; }
+    .nav-logo-icon {
+      width: 34px; height: 34px; background: var(--verde-700); border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 16px; color: var(--verde-200);
+    }
+    .nav-logo-text strong {
+      display: block; font-family: 'Space Grotesk', sans-serif;
+      font-size: 13px; font-weight: 600; color: #fff; letter-spacing: -.01em; line-height: 1.15;
+    }
+    .nav-logo-text span { font-size: 10px; color: rgba(255,255,255,.38); }
+    .nav-sep { width: 1px; height: 24px; background: rgba(255,255,255,.1); margin: 0 8px; flex-shrink: 0; }
+    .nav-top-spacer { flex: 1; }
+
+    .nav-busqueda {
+      display: flex; align-items: center; gap: 7px;
+      background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.12);
+      border-radius: 8px; padding: 6px 12px; width: 190px;
+    }
+    .nav-busqueda i { color: rgba(255,255,255,.38); font-size: 12px; flex-shrink: 0; }
+    .nav-busqueda input {
+      border: none; background: transparent;
+      font-family: 'DM Sans', sans-serif; font-size: 13px; color: #fff; outline: none; width: 100%;
+    }
+    .nav-busqueda input::placeholder { color: rgba(255,255,255,.32); }
+
+    .nav-notif {
+      width: 32px; height: 32px; border-radius: 8px;
+      background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.12);
+      display: flex; align-items: center; justify-content: center;
+      color: rgba(255,255,255,.6); font-size: 13px; cursor: pointer;
+      position: relative; transition: background .15s; flex-shrink: 0;
+    }
+    .nav-notif:hover { background: rgba(255,255,255,.14); color: #fff; }
+    .notif-dot {
+      position: absolute; top: 6px; right: 6px;
+      width: 6px; height: 6px; border-radius: 50%;
+      background: #E05050; border: 1.5px solid var(--verde-900);
+    }
+    .nav-user {
+      display: flex; align-items: center; gap: 7px;
+      padding: 4px 10px 4px 5px; border-radius: 20px;
+      background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.12);
+      cursor: pointer; transition: background .15s; flex-shrink: 0;
+    }
+    .nav-user:hover { background: rgba(255,255,255,.14); }
+    .nav-avatar {
+      width: 24px; height: 24px; border-radius: 50%; background: var(--verde-600);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 11px; color: var(--verde-200);
+    }
+    .nav-user-name { font-size: 12px; font-weight: 500; color: rgba(255,255,255,.82); }
+
+    .nav-bottom { display: flex; align-items: center; padding: 0 36px; height: 40px; gap: 2px; }
+    .nav-link {
+      display: flex; align-items: center; gap: 6px;
+      padding: 5px 13px; border-radius: 7px;
+      color: rgba(255,255,255,.52); font-size: 13px; font-weight: 400;
+      text-decoration: none; cursor: pointer; transition: all .15s; white-space: nowrap;
+    }
+    .nav-link i { font-size: 13px; }
+    .nav-link:hover { background: rgba(255,255,255,.08); color: rgba(255,255,255,.9); }
+    .nav-link.activo { background: rgba(255,255,255,.14); color: #fff; font-weight: 500; }
+    .nav-link.activo i { color: var(--verde-300); }
+    .nav-badge {
+      background: var(--rojo-text); color: #fff;
+      font-size: 10px; padding: 1px 6px; border-radius: 20px; font-weight: 500;
+    }
+
+    /* ── CONTENT ──────────────────────────────────────── */
+    .content {
+      flex: 1; padding: 32px 48px 56px;
+      max-width: 1200px; width: 100%; margin: 0 auto;
+    }
+
+    .page-head { margin-bottom: 24px; }
+    .page-titulo {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 28px; font-weight: 700; color: var(--gris-900);
+      letter-spacing: -.03em; line-height: 1.1;
+    }
+    .page-subtitulo { font-size: 13px; color: var(--gris-400); margin-top: 4px; }
+
+    /* ── LAYOUT PRINCIPAL: mapa + panel ──────────────── */
+    .main-layout {
+      display: grid;
+      grid-template-columns: 1fr 260px;
+      gap: 20px;
+      align-items: start;
+    }
+
+    /* ── PANEL IZQUIERDO: mapa de puestos ─────────────── */
+    .mapa-panel {
+      background: var(--verde-50);
+      border: 1px solid var(--verde-200);
+      border-radius: var(--radio-xl);
+      padding: 24px;
+    }
+
+    /* Leyenda de colores */
+    .leyenda {
+      display: flex; align-items: center; gap: 10px;
+      margin-bottom: 22px; flex-wrap: wrap;
+    }
+    .leyenda-pill {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 5px 14px; border-radius: 20px;
+      font-size: 12px; font-weight: 500; cursor: default;
+    }
+    .leyenda-pill .ldot { width: 7px; height: 7px; border-radius: 50%; }
+    .lp-disponible { background: #D6F0CC; color: #2A6210; }
+    .lp-disponible .ldot { background: var(--puesto-disponible); }
+    .lp-ocupado    { background: #FAD7D5; color: #7A1A1A; }
+    .lp-ocupado    .ldot { background: var(--puesto-ocupado); }
+    .lp-moroso     { background: #FFF4D8; color: #7A6000; }
+    .lp-moroso     .ldot { background: var(--puesto-moroso); }
+
+    /* Grid de puestos */
+    .puestos-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+    }
+
+    .puesto-card {
+      border-radius: var(--radio-lg);
+      padding: 16px 18px 18px;
+      cursor: pointer;
+      transition: transform .13s, box-shadow .13s, outline .1s;
+      display: flex; flex-direction: column; gap: 6px;
+      min-height: 110px;
+      position: relative;
+      outline: 3px solid transparent;
+    }
+    .puesto-card:hover { transform: translateY(-2px); box-shadow: 0 6px 18px rgba(0,0,0,.15); }
+    .puesto-card.seleccionado { outline: 3px solid #fff; box-shadow: 0 0 0 5px rgba(0,0,0,.18); }
+
+    .puesto-card.disponible { background: var(--puesto-disponible); }
+    .puesto-card.ocupado    { background: var(--puesto-ocupado); }
+    .puesto-card.moroso     { background: var(--puesto-moroso); }
+
+    .puesto-id {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 13px; font-weight: 600; color: rgba(255,255,255,.75);
+      letter-spacing: .04em;
+    }
+    .puesto-nombre {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 16px; font-weight: 700; color: #fff;
+      letter-spacing: -.01em; line-height: 1.2;
+    }
+    .puesto-giro {
+      font-size: 13px; color: rgba(255,255,255,.8);
+      margin-top: auto; padding-top: 6px;
+    }
+
+    /* ── PANEL DERECHO: detalle ───────────────────────── */
+    .detalle-panel {
+      background: var(--blanco);
+      border: 1px solid var(--gris-200);
+      border-radius: var(--radio-xl);
+      overflow: hidden;
+      box-shadow: var(--sombra-sm);
+    }
+
+    .detalle-header {
+      background: var(--verde-50);
+      border-bottom: 1px solid var(--verde-200);
+      padding: 16px 20px;
+    }
+    .detalle-header-label {
+      font-size: 10px; font-weight: 500; color: var(--verde-600);
+      text-transform: uppercase; letter-spacing: .08em;
+      margin-bottom: 2px;
+    }
+    .detalle-header-id {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 22px; font-weight: 700; color: var(--gris-900);
+      letter-spacing: -.02em;
+    }
+
+    .detalle-body { padding: 6px 0; }
+
+    .detalle-row {
+      display: flex; align-items: flex-start; gap: 12px;
+      padding: 12px 20px;
+      border-bottom: 1px solid var(--gris-100);
+    }
+    .detalle-row:last-child { border-bottom: none; }
+
+    .detalle-icon {
+      width: 28px; height: 28px; border-radius: 7px;
+      background: var(--verde-100); color: var(--verde-700);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 12px; flex-shrink: 0; margin-top: 1px;
+    }
+    .detalle-info { display: flex; flex-direction: column; gap: 1px; }
+    .detalle-key {
+      font-size: 10px; font-weight: 500; color: var(--gris-400);
+      text-transform: uppercase; letter-spacing: .07em;
+    }
+    .detalle-val {
+      font-size: 14px; font-weight: 500; color: var(--gris-900);
+    }
+
+    /* badge de estado en el detalle */
+    .badge {
+      display: inline-flex; align-items: center; gap: 5px;
+      padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 500;
+    }
+    .bdot { width: 6px; height: 6px; border-radius: 50%; }
+    .badge-disponible { background: #D6F0CC; color: #2A6210; }
+    .badge-disponible .bdot { background: var(--puesto-disponible); }
+    .badge-ocupado    { background: #FAD7D5; color: #7A1A1A; }
+    .badge-ocupado    .bdot { background: var(--puesto-ocupado); }
+    .badge-moroso     { background: #FFF4D8; color: #7A6000; }
+    .badge-moroso     .bdot { background: var(--puesto-moroso); }
+
+    /* Acciones del panel */
+    .detalle-acciones {
+      border-top: 1px solid var(--gris-200);
+      padding: 14px 20px;
+      display: flex; flex-direction: column; gap: 8px;
+    }
+    .btn-accion {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 10px 14px; border-radius: var(--radio);
+      border: 1.5px solid var(--gris-200); background: var(--blanco);
+      font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 500;
+      color: var(--gris-600); cursor: pointer; transition: all .15s;
+      text-decoration: none;
+    }
+    .btn-accion:hover { background: var(--verde-50); border-color: var(--verde-300); color: var(--verde-800); }
+    .btn-accion .left { display: flex; align-items: center; gap: 8px; }
+    .btn-accion i { font-size: 13px; }
+    .btn-accion .chevron { color: var(--gris-400); font-size: 11px; }
+
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--gris-200); border-radius: 3px; }
+  </style>
+</head>
+<body>
+
+  <!-- ══ NAVBAR ══════════════════════════════════════════ -->
+  <nav class="navbar">
+    <div class="nav-top">
+      <a class="nav-logo" href="#">
+        <div class="nav-logo-icon"><i class="fa-solid fa-store"></i></div>
+        <div class="nav-logo-text">
+          <strong>Mercado Municipal</strong>
+          <span>Panel administrativo</span>
+        </div>
+      </a>
+      <div class="nav-sep"></div>
+      <div class="nav-top-spacer"></div>
+      <div class="nav-busqueda">
+        <i class="fa-solid fa-magnifying-glass"></i>
+        <input type="text" placeholder="Buscar locatario..." />
+      </div>
+      <div class="nav-notif" title="Notificaciones">
+        <i class="fa-regular fa-bell"></i>
+        <span class="notif-dot"></span>
+      </div>
+      <div class="nav-user">
+        <div class="nav-avatar"><i class="fa-solid fa-user"></i></div>
+        <span class="nav-user-name">Administrador</span>
+      </div>
+    </div>
+    <div class="nav-bottom">
+      <a class="nav-link" href="#"><i class="fa-solid fa-house"></i> Dashboard</a>
+      <a class="nav-link" href="#"><i class="fa-solid fa-users"></i> Locatarios</a>
+      <a class="nav-link activo" href="#"><i class="fa-solid fa-shop"></i> Puestos</a>
+      <a class="nav-link" href="#"><i class="fa-solid fa-credit-card"></i> Pagos</a>
+      <a class="nav-link" href="#"><i class="fa-solid fa-triangle-exclamation"></i> Incidencias <span class="nav-badge">3</span></a>
+      <a class="nav-link" href="#"><i class="fa-solid fa-chart-bar"></i> Reportes</a>
+    </div>
+  </nav>
+
+  <!-- ══ CONTENT ═════════════════════════════════════════ -->
+  <div class="content">
+
+    <div class="page-head">
+      <h1 class="page-titulo">Gestión de puestos</h1>
+      <p class="page-subtitulo">Mapa visual de ocupación · Mercado Municipal</p>
+    </div>
+
+    <div class="main-layout">
+
+      <!-- ── MAPA DE PUESTOS ───────────────────────────── -->
+      <div class="mapa-panel">
+        <!-- Leyenda -->
+        <div class="leyenda">
+          <span class="leyenda-pill lp-disponible"><span class="ldot"></span>Disponibles</span>
+          <span class="leyenda-pill lp-ocupado"><span class="ldot"></span>Ocupados</span>
+          <span class="leyenda-pill lp-moroso"><span class="ldot"></span>Morosos</span>
+        </div>
+
+        <!-- Grid de puestos -->
+        <div class="puestos-grid" id="puestosGrid">
+
+          <div class="puesto-card disponible" data-id="A-01" data-locatario="—" data-giro="—" data-pago="—" data-estado="Disponible">
+            <span class="puesto-id">A-01</span>
+            <span class="puesto-nombre">Disponible</span>
+          </div>
+
+          <div class="puesto-card ocupado seleccionado" data-id="A-02" data-locatario="Isaí Robles" data-giro="Comida" data-pago="10 Mayo 2026" data-estado="Ocupado">
+            <span class="puesto-id">A-02</span>
+            <span class="puesto-nombre">Isaí Robles</span>
+            <span class="puesto-giro">Comida</span>
+          </div>
+
+          <div class="puesto-card moroso" data-id="B-04" data-locatario="Raúl Lora" data-giro="Tecnología" data-pago="02 Abr 2026" data-estado="Moroso">
+            <span class="puesto-id">B-04</span>
+            <span class="puesto-nombre">Raúl Lora</span>
+            <span class="puesto-giro">Tecnología</span>
+          </div>
+
+          <div class="puesto-card ocupado" data-id="C-09" data-locatario="Pedro Bautista" data-giro="Celulares" data-pago="15 Mar 2026" data-estado="Ocupado">
+            <span class="puesto-id">C-09</span>
+            <span class="puesto-nombre">Pedro Bautista</span>
+            <span class="puesto-giro">Celulares</span>
+          </div>
+
+          <div class="puesto-card moroso" data-id="D-04" data-locatario="José Mendoza" data-giro="Verdulería" data-pago="01 Mar 2026" data-estado="Moroso">
+            <span class="puesto-id">D-04</span>
+            <span class="puesto-nombre">José Mendoza</span>
+            <span class="puesto-giro">Verdulería</span>
+          </div>
+
+          <div class="puesto-card disponible" data-id="A-01b" data-locatario="—" data-giro="—" data-pago="—" data-estado="Disponible">
+            <span class="puesto-id">E-01</span>
+            <span class="puesto-nombre">Disponible</span>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- ── PANEL DE DETALLE ──────────────────────────── -->
+      <div class="detalle-panel" id="detallePanel">
+        <div class="detalle-header">
+          <div class="detalle-header-label">Puesto</div>
+          <div class="detalle-header-id" id="detId">A-02</div>
+        </div>
+        <div class="detalle-body">
+          <div class="detalle-row">
+            <div class="detalle-icon"><i class="fa-solid fa-user"></i></div>
+            <div class="detalle-info">
+              <span class="detalle-key">Locatario</span>
+              <span class="detalle-val" id="detLocatario">Isaí Robles</span>
+            </div>
+          </div>
+          <div class="detalle-row">
+            <div class="detalle-icon"><i class="fa-solid fa-tag"></i></div>
+            <div class="detalle-info">
+              <span class="detalle-key">Giro Comercial</span>
+              <span class="detalle-val" id="detGiro">Comida</span>
+            </div>
+          </div>
+          <div class="detalle-row">
+            <div class="detalle-icon"><i class="fa-regular fa-calendar"></i></div>
+            <div class="detalle-info">
+              <span class="detalle-key">Último Pago</span>
+              <span class="detalle-val" id="detPago">10 Mayo 2026</span>
+            </div>
+          </div>
+          <div class="detalle-row">
+            <div class="detalle-icon"><i class="fa-regular fa-circle-check"></i></div>
+            <div class="detalle-info">
+              <span class="detalle-key">Estado</span>
+              <span id="detEstado"><span class="badge badge-ocupado"><span class="bdot"></span>Ocupado</span></span>
+            </div>
+          </div>
+        </div>
+        <div class="detalle-acciones">
+          <button class="btn-accion">
+            <span class="left"><i class="fa-solid fa-arrows-rotate"></i> Cambiar Estado</span>
+            <i class="fa-solid fa-chevron-right chevron"></i>
+          </button>
+          <button class="btn-accion">
+            <span class="left"><i class="fa-solid fa-right-from-bracket"></i> Liberar puesto</span>
+            <i class="fa-solid fa-chevron-right chevron"></i>
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </div><!-- /content -->
+
+  <script>
+    const badgeMap = {
+      'Disponible': '<span class="badge badge-disponible"><span class="bdot"></span>Disponible</span>',
+      'Ocupado':    '<span class="badge badge-ocupado"><span class="bdot"></span>Ocupado</span>',
+      'Moroso':     '<span class="badge badge-moroso"><span class="bdot"></span>Moroso</span>',
+    };
+
+    document.querySelectorAll('.puesto-card').forEach(card => {
+      card.addEventListener('click', () => {
+        document.querySelectorAll('.puesto-card').forEach(c => c.classList.remove('seleccionado'));
+        card.classList.add('seleccionado');
+
+        document.getElementById('detId').textContent        = card.dataset.id;
+        document.getElementById('detLocatario').textContent = card.dataset.locatario;
+        document.getElementById('detGiro').textContent      = card.dataset.giro;
+        document.getElementById('detPago').textContent      = card.dataset.pago;
+        document.getElementById('detEstado').innerHTML      = badgeMap[card.dataset.estado] || card.dataset.estado;
+      });
+    });
+  </script>
+
+</body>
+</html>
