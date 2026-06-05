@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mercado Municipal — Gestión de Incidencias</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; }
+
+    :root {
+      --verde-900: #1E3A14;
+      --verde-800: #2C5020;
+      --verde-700: #3B6228;
+      --verde-600: #4A7A33;
+      --verde-400: #7DB05A;
+      --verde-300: #A0C980;
+      --verde-200: #C5E0A8;
+      --verde-100: #E2F0D0;
+      --verde-50:  #F0F7E8;
+      --arena:     #F8F6F1;
+      --blanco:    #FFFFFF;
+      --gris-100:  #F2F0EB;
+      --gris-200:  #E0DDD6;
+      --gris-400:  #A8A49E;
+      --gris-600:  #706C65;
+      --gris-900:  #1C1A18;
+      --rojo-bg:   #FDEEEE;
+      --rojo-text: #8A2020;
+      --rojo-borde:#F0B0B0;
+      --radio:     10px;
+      --radio-lg:  16px;
+      --radio-xl:  22px;
+      --sombra-sm: 0 1px 4px rgba(0,0,0,.06);
+    }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--arena);
+      color: var(--gris-900);
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    /* ── NAVBAR SUPERIOR ───────────────────── */
+    .navbar {
+      background: var(--verde-900);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .nav-top {
+      display: flex; align-items: center; padding: 0 36px; height: 52px;
+      border-bottom: 1px solid rgba(255,255,255,.07); gap: 12px;
+    }
+    .nav-logo { display: flex; align-items: center; gap: 10px; text-decoration: none; flex-shrink: 0; }
+    .nav-logo-icon { width: 34px; height: 34px; background: var(--verde-700); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 16px; color: var(--verde-200); }
+    .nav-logo-text strong { display: block; font-family: 'Space Grotesk', sans-serif; font-size: 13px; font-weight: 600; color: #fff; letter-spacing: -.01em; line-height: 1.15; }
+    .nav-logo-text span { font-size: 10px; color: rgba(255,255,255,.38); }
+    .nav-sep { width: 1px; height: 24px; background: rgba(255,255,255,.1); margin: 0 8px; flex-shrink: 0; }
+    .nav-top-spacer { flex: 1; }
+    
+    .nav-busqueda { display: flex; align-items: center; gap: 7px; background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.12); border-radius: 8px; padding: 6px 12px; width: 190px; }
+    .nav-busqueda i { color: rgba(255,255,255,.38); font-size: 12px; flex-shrink: 0; }
+    .nav-busqueda input { border: none; background: transparent; font-family: 'DM Sans', sans-serif; font-size: 13px; color: #fff; outline: none; width: 100%; }
+    .nav-busqueda input::placeholder { color: rgba(255,255,255,.32); }
+
+    .nav-notif { width: 32px; height: 32px; border-radius: 8px; background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.12); display: flex; align-items: center; justify-content: center; color: rgba(255,255,255,.6); font-size: 13px; cursor: pointer; position: relative; transition: background .15s; flex-shrink: 0; }
+    .nav-notif:hover { background: rgba(255,255,255,.14); color: #fff; }
+    .notif-dot { position: absolute; top: 6px; right: 6px; width: 6px; height: 6px; border-radius: 50%; background: #E05050; border: 1.5px solid var(--verde-900); }
+
+    .nav-user { display: flex; align-items: center; gap: 7px; padding: 4px 10px 4px 5px; border-radius: 20px; background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.12); cursor: pointer; transition: background .15s; flex-shrink: 0; }
+    .nav-user:hover { background: rgba(255,255,255,.14); }
+    .nav-avatar { width: 24px; height: 24px; border-radius: 50%; background: var(--verde-600); display: flex; align-items: center; justify-content: center; font-size: 11px; color: var(--verde-200); }
+    .nav-user-name { font-size: 12px; font-weight: 500; color: rgba(255,255,255,.82); }
+
+    .nav-bottom { display: flex; align-items: center; padding: 0 36px; height: 40px; gap: 2px; }
+    .nav-link { display: flex; align-items: center; gap: 6px; padding: 5px 13px; border-radius: 7px; color: rgba(255,255,255,.52); font-size: 13px; font-weight: 400; text-decoration: none; cursor: pointer; transition: all .15s; white-space: nowrap; }
+    .nav-link i { font-size: 13px; }
+    .nav-link:hover { background: rgba(255,255,255,.08); color: rgba(255,255,255,.9); }
+    .nav-link.activo { background: rgba(255,255,255,.14); color: #fff; font-weight: 500; }
+    .nav-link.activo i { color: var(--verde-300); }
+    .nav-badge { background: var(--rojo-text); color: #fff; font-size: 10px; padding: 1px 6px; border-radius: 20px; font-weight: 500; }
+
+    /* ── CONTENT ──────────────────────────────────────── */
+    .content { flex: 1; padding: 32px 48px 56px; max-width: 1400px; width: 100%; margin: 0 auto; }
+    
+    .page-head { margin-bottom: 28px; }
+    .page-titulo { font-family: 'Space Grotesk', sans-serif; font-size: 28px; font-weight: 700; color: var(--gris-900); letter-spacing: -.03em; line-height: 1.1; }
+    .page-subtitulo { font-size: 13px; color: var(--gris-400); margin-top: 4px; }
+
+    /* ── LAYOUT GRID (2 COLUMNAS) ─────────────────────── */
+    .incidencias-grid {
+      display: grid;
+      grid-template-columns: 1.4fr 1fr;
+      gap: 24px;
+      align-items: start;
+    }
+
+    /* ── COMPONENTES COMPARTIDOS ──────────────────────── */
+    .panel-wrap {
+      background: var(--blanco);
+      border: 1px solid var(--gris-200);
+      border-radius: var(--radio-xl);
+      overflow: hidden;
+      box-shadow: var(--sombra-sm);
+    }
+    .panel-header {
+      padding: 18px 24px;
+      border-bottom: 1px solid var(--gris-200);
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .panel-titulo {
+      font-family: 'Space Grotesk', sans-serif; font-size: 15px; font-weight: 600; color: var(--gris-900);
+    }
+
+    /* ── TABLA DE INCIDENCIAS ─────────────────────────── */
+    table { width: 100%; border-collapse: collapse; }
+    thead tr { background: var(--verde-50); border-bottom: 1px solid var(--verde-200); }
+    thead th { padding: 11px 20px; text-align: left; font-size: 11px; font-weight: 500; color: var(--verde-700); text-transform: uppercase; letter-spacing: .07em; }
+    
+    tbody tr { border-bottom: 1px solid var(--gris-100); transition: background .1s; }
+    tbody tr:last-child { border-bottom: none; }
+    tbody tr:hover { background: var(--verde-50); }
+    td { padding: 13px 20px; vertical-align: middle; }
+
+    .td-titulo { font-family: 'Space Grotesk', sans-serif; font-size: 13px; font-weight: 600; color: var(--gris-900); line-height: 1.3; }
+    .td-titulo span { display: block; font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 400; color: var(--gris-600); margin-top: 2px;}
+    .td-puesto { font-size: 13px; font-weight: 500; color: var(--gris-900); }
+    .td-fecha { font-size: 12px; color: var(--gris-400); line-height: 1.4; }
+
+    /* Badges */
+    .badge { display: inline-flex; align-items: center; gap: 5px; padding: 5px 12px; border-radius: 20px; font-size: 12px; font-weight: 500; }
+    .bdot { width: 6px; height: 6px; border-radius: 50%; }
+    
+    .badge-dark { background: var(--verde-900); color: #fff; }
+    .badge-dark .bdot { background: #fff; }
+    .badge-proceso { background: var(--verde-100); color: var(--verde-800); }
+    .badge-proceso .bdot { background: var(--verde-600); }
+    
+    .estado-text { display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 500; color: var(--gris-600); }
+    .estado-text .bdot { background: var(--verde-600); }
+
+    /* Evidencia */
+    .evidencia-box {
+      background: var(--arena); border: 1px solid var(--gris-200); border-radius: var(--radio);
+      padding: 14px; margin: 8px 0; display: inline-block; width: auto; min-width: 250px;
+    }
+    .evidencia-box p { font-size: 12px; font-weight: 500; color: var(--gris-600); margin-bottom: 8px; }
+    .evidencia-box strong { color: var(--gris-900); }
+    .evidencia-img { width: 80px; height: 60px; background: var(--gris-200); border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 18px; color: var(--gris-400); }
+
+    /* ── SECCIÓN DE AVISOS ────────────────────────────── */
+    .avisos-content { padding: 24px; }
+    
+    .aviso-item {
+      border: 1px solid var(--gris-200); background: var(--blanco); border-radius: var(--radio);
+      padding: 16px; margin-bottom: 14px; display: flex; gap: 14px; align-items: flex-start;
+      transition: border-color .2s;
+    }
+    .aviso-item:hover { border-color: var(--verde-300); }
+    .aviso-icon {
+      width: 36px; height: 36px; background: var(--verde-50); color: var(--verde-700);
+      border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0;
+    }
+    .aviso-text h4 { font-family: 'Space Grotesk', sans-serif; font-size: 14px; color: var(--gris-900); margin-bottom: 4px; }
+    .aviso-text p { font-size: 12px; color: var(--gris-600); line-height: 1.4; }
+
+    /* Notificaciones en tiempo real */
+    .rt-panel {
+      background: var(--verde-50); border: 1px solid var(--verde-200); border-radius: var(--radio-lg);
+      padding: 20px; margin-top: 24px;
+    }
+    .rt-title { font-size: 11px; font-weight: 600; color: var(--verde-800); text-transform: uppercase; letter-spacing: .05em; margin-bottom: 12px; }
+    .rt-item { font-size: 12px; font-weight: 500; padding: 10px 0; border-bottom: 1px solid var(--verde-200); color: var(--verde-900); display: flex; align-items: center; gap: 8px; }
+    .rt-item::before { content: ""; display: block; width: 4px; height: 4px; background: var(--verde-600); border-radius: 50%; }
+    .rt-item:last-child { border-bottom: none; padding-bottom: 0; }
+
+    /* ── BOTONES GLOBALES ─────────────────────────────── */
+    .btn-container { padding: 20px 24px; background: var(--blanco); border-top: 1px solid var(--gris-200); text-align: right; }
+    .btnPrimary {
+      display: inline-flex; align-items: center; gap: 7px; padding: 9px 18px; border-radius: var(--radio);
+      font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 500; cursor: pointer;
+      background: var(--verde-800); color: #fff; border: 1.5px solid var(--verde-800); transition: all .15s;
+    }
+    .btnPrimary:hover { background: var(--verde-700); border-color: var(--verde-700); }
+    .btnOutline {
+      display: inline-flex; align-items: center; gap: 7px; padding: 9px 18px; border-radius: var(--radio);
+      font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 500; cursor: pointer;
+      background: var(--blanco); color: var(--verde-800); border: 1.5px solid var(--verde-300); transition: all .15s;
+    }
+    .btnOutline:hover { background: var(--verde-50); border-color: var(--verde-400); }
+  </style>
+</head>
+<body>
+
+  <!-- ══ NAVBAR ══════════════════════════════════════════ -->
+  <nav class="navbar">
+    <div class="nav-top">
+      <a class="nav-logo" href="#">
+        <div class="nav-logo-icon"><i class="fa-solid fa-store"></i></div>
+        <div class="nav-logo-text">
+          <strong>Mercado Municipal</strong>
+          <span>Panel administrativo</span>
+        </div>
+      </a>
+      <div class="nav-sep"></div>
+      <div class="nav-top-spacer"></div>
+      <div class="nav-busqueda">
+        <i class="fa-solid fa-magnifying-glass"></i>
+        <input type="text" placeholder="Buscar..." />
+      </div>
+      <div class="nav-notif">
+        <i class="fa-regular fa-bell"></i>
+        <span class="notif-dot"></span>
+      </div>
+      <div class="nav-user">
+        <div class="nav-avatar"><i class="fa-solid fa-user"></i></div>
+        <span class="nav-user-name">Administrador</span>
+      </div>
+    </div>
+    <div class="nav-bottom">
+      <a class="nav-link" href="#"><i class="fa-solid fa-house"></i> Dashboard</a>
+      <a class="nav-link" href="#"><i class="fa-solid fa-users"></i> Locatarios</a>
+      <a class="nav-link" href="#"><i class="fa-solid fa-shop"></i> Puestos</a>
+      <a class="nav-link" href="#"><i class="fa-solid fa-credit-card"></i> Pagos</a>
+      <a class="nav-link activo" href="#"><i class="fa-solid fa-triangle-exclamation"></i> Incidencias <span class="nav-badge">3</span></a>
+      <a class="nav-link" href="#"><i class="fa-solid fa-chart-bar"></i> Reportes</a>
+    </div>
+  </nav>
+
+  <!-- ══ CONTENT ═════════════════════════════════════════ -->
+  <div class="content">
+
+    <div class="page-head">
+      <h1 class="page-titulo">Gestión de Incidencias y Avisos</h1>
+      <p class="page-subtitulo">Control y seguimiento de reportes en tiempo real</p>
+    </div>
+
+    <div class="incidencias-grid">
+      
+      <!-- COLUMNA IZQUIERDA: TABLA INCIDENCIAS -->
+      <div class="panel-wrap">
+        <div class="panel-header">
+          <span class="panel-titulo">Control de Incidencias</span>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>Título</th>
+              <th>Puesto / Locatario</th>
+              <th>Estado (Badges)</th>
+              <th>Severidad</th>
+              <th>Última Acción</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="td-titulo">Cortocircuito<span>Pasillo C, Fuga Agua</span></td>
+              <td class="td-puesto">Puesto #10</td>
+              <td><span class="badge badge-dark">Abierta</span></td>
+              <td><div class="estado-text"><span class="bdot" style="background:#C83030"></span> Abierta</div></td>
+              <td class="td-fecha">25 mayo<br>10:00 am</td>
+            </tr>
+            <tr>
+              <td class="td-titulo">Cortocircuito<span>Pasillo A, Fuga Agua</span></td>
+              <td class="td-puesto">Puesto #9</td>
+              <td><span class="badge badge-proceso">En Proceso</span></td>
+              <td><div class="estado-text"><span class="bdot"></span> Abierta</div></td>
+              <td class="td-fecha">25 mayo<br>11:00 am</td>
+            </tr>
+            <tr>
+              <td class="td-titulo">Cortocircuito<span>Pasillo B, Fuga Agua</span></td>
+              <td class="td-puesto">Puesto #9</td>
+              <td><span class="badge badge-dark">#152</span></td>
+              <td><div class="estado-text"><span class="bdot" style="background:#C83030"></span> Abierta</div></td>
+              <td class="td-fecha">26 mayo<br>3:00 pm</td>
+            </tr>
+            
+            <!-- Fila de Evidencia Integrada -->
+            <tr>
+              <td colspan="5" style="border-bottom: none; padding-bottom: 0;">
+                <div class="evidencia-box">
+                  <p>Evidencia: <strong>agua</strong></p>
+                  <p>Título: <strong>(Fuga de Agua)</strong></p>
+                  <div class="evidencia-img"><i class="fa-regular fa-image"></i></div>
+                </div>
+              </td>
+            </tr>
+
+            <tr>
+              <td class="td-titulo">Cortocircuito<span>Pasillo E, Fuga Agua</span></td>
+              <td class="td-puesto">Puesto #9</td>
+              <td><span class="badge badge-dark">#230</span></td>
+              <td><div class="estado-text"><span class="bdot" style="background:#C83030"></span> Abierta</div></td>
+              <td class="td-fecha">27 mayo<br>9:00 am</td>
+            </tr>
+            <tr>
+              <td class="td-titulo">Cortocircuito<span>Pasillo D, Fuga Agua</span></td>
+              <td class="td-puesto">Puesto #9</td>
+              <td><span class="badge badge-proceso">En Proceso</span></td>
+              <td><div class="estado-text"><span class="bdot"></span> Abierta</div></td>
+              <td class="td-fecha">27 mayo<br>10:00 am</td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="btn-container">
+          <button class="btnOutline"><i class="fa-solid fa-list"></i> Ver historial completo</button>
+        </div>
+      </div>
+
+      <!-- COLUMNA DERECHA: AVISOS -->
+      <div class="panel-wrap">
+        <div class="panel-header">
+          <span class="panel-titulo">Avisos y Notificaciones</span>
+        </div>
+        <div class="avisos-content">
+          
+          <!-- Lista de Avisos -->
+          <div class="aviso-item">
+            <div class="aviso-icon"><i class="fa-solid fa-bullhorn"></i></div>
+            <div class="aviso-text">
+              <h4>Suspensión de agua</h4>
+              <p>Suspensión de agua en colonias de Tizayuca desde el 20 de Mayo.</p>
+            </div>
+          </div>
+          <div class="aviso-item">
+            <div class="aviso-icon"><i class="fa-solid fa-bullhorn"></i></div>
+            <div class="aviso-text">
+              <h4>Fumigación</h4>
+              <p>Registro para iniciar la fumigación en las colonias solicitadas.</p>
+            </div>
+          </div>
+          <div class="aviso-item">
+            <div class="aviso-icon"><i class="fa-solid fa-bullhorn"></i></div>
+            <div class="aviso-text">
+              <h4>Reactivación de agua</h4>
+              <p>Se reactiva el sistema de agua a las colonias donde fueron suspendidas a partir del 30 de Mayo.</p>
+            </div>
+          </div>
+          <div class="aviso-item">
+            <div class="aviso-icon"><i class="fa-solid fa-bullhorn"></i></div>
+            <div class="aviso-text">
+              <h4>Fallo de Electricidad</h4>
+              <p>Revisión en algunas colonias sobre la electricidad.</p>
+            </div>
+          </div>
+
+          <!-- Caja de Tiempo Real -->
+          <div class="rt-panel">
+            <div class="rt-title">Notificaciones en tiempo real</div>
+            <div class="rt-item">Suspensión de agua</div>
+            <div class="rt-item">Fumigación</div>
+            <div class="rt-item">Conflicto entre locatarios</div>
+            <div class="rt-item">Falla eléctrica</div>
+          </div>
+
+        </div>
+        <div class="btn-container">
+          <button class="btnPrimary"><i class="fa-solid fa-gear"></i> Administrar Avisos</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</body>
+</html>
